@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', trns($route)); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -87,7 +89,7 @@
     <div>
       <button class="btn btn-success" id="bulkStatusUpdate"><?php echo e(trns("Update_Selected")); ?></button>
       <button class="btn btn-danger" id="deleteSelected"><?php echo e(trns("Delete_Selected")); ?></button>
-      <a href="<?php echo e(route($route . '.create')); ?>" class="btn btn-primary"><?php echo e(trns('Add_New')); ?> <?php echo e($route); ?></a>
+      <a href="<?php echo e(route($route . '.create')); ?>" class="btn btn-primary"><?php echo e(trns('Add_New')); ?></a>
     </div>
   </h5>
    <!-- Delete Selected Modal -->
@@ -111,17 +113,16 @@
 
   <div class="card-body">
     <div class="table-responsive text-nowrap">
-      <table class="table table-bordered" id="usersTable">
+      <table class="table table-bordered" id="dataTable">
         <thead>
           <tr>
             <th><input type="checkbox" id="select-all"></th>
-            <th><?php echo e(trns('title')); ?></th>
-            <th><?php echo e(trns('description')); ?></th>
-            <th><?php echo e(trns('url')); ?></th>
+            <th><?php echo e(trns('user_name')); ?></th>
+            <th><?php echo e(trns('email')); ?></th>
+            <th><?php echo e(trns('role')); ?></th>
             <th><?php echo e(trns('image')); ?></th>
-            <th><?php echo e(trns('category')); ?></th>
-            <th><?php echo e(trns('sort_order')); ?></th>
-            <th><?php echo e(trns('partner_id')); ?></th>
+            <th><?php echo e(trns('code')); ?></th>
+            <th><?php echo e(trns('created_at')); ?></th>
             <th><?php echo e(trns('Actions')); ?></th>
           </tr>
         </thead>
@@ -146,7 +147,7 @@
 
 <script>
 $(document).ready(function () {
-    const table = $('#usersTable').DataTable({
+    const table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: '<?php echo e(route($route . ".index")); ?>',
@@ -159,13 +160,12 @@ $(document).ready(function () {
                     return `<input type="checkbox" class="row-checkbox" value="${data}">`;
                 }
             },
-            { data: 'title', name: 'title' },
-            { data: 'description', name: 'description' },
-            { data: 'url', name: 'url' },
-            { data: 'image', name: 'image' },
-            { data: 'category', name: 'category' },
-            { data: 'sort_order', name: 'sort_order' },
-            { data: 'partner_id', name: 'partner_id' },
+            { data: 'user_name', name: 'user_name' },
+            { data: 'email', name: 'email' },
+            { data: 'role', name: 'role' },
+            { data: 'image', name: 'image'},
+            { data: 'code', name: 'code' },
+            { data: 'created_at', name: 'created_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],
 
@@ -181,52 +181,7 @@ $(document).ready(function () {
         }
     });
 
-    $('#select-all').on('click', function () {
-        const rows = table.rows({ search: 'applied' }).nodes();
-        $('input[type="checkbox"].row-checkbox', rows).prop('checked', this.checked);
-    });
-
-    $('#usersTable tbody').on('change', 'input.row-checkbox', function () {
-        if (!this.checked) {
-            $('#select-all').prop('checked', false);
-        }
-    });
-
-    $('#bulkStatusUpdate').on('click', function () {
-        const selectedIds = [];
-        $('input.row-checkbox:checked').each(function () {
-            selectedIds.push($(this).val());
-        });
-
-        if (selectedIds.length === 0) {
-            alert('<?php echo e(trns("Please select at least one user.")); ?>');
-            return;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: '<?php echo e(route($route . ".updateColumnSelected")); ?>',
-            data: {
-                _token: '<?php echo e(csrf_token()); ?>',
-                ids: selectedIds,
-                status: 'Active' 
-            },
-            success: function (data) {
-                if (data.status === 200) {
-                    toastr.success("Updated Successfully");
-                    table.ajax.reload();
-                } else {
-                    toastr.error("Something went wrong");
-                }
-            },
-            error: function () {
-                toastr.error("AJAX Error");
-            }
-        });
-    });
-
-
-         // Bulk Delete
+       // Bulk Delete
       $('#deleteSelected').on('click', function () {
           const selected = $('.row-checkbox:checked').map(function() {
               return $(this).val();
@@ -266,35 +221,13 @@ $(document).ready(function () {
               });
           });
       });
-
-
-
+    
 });
 
-    // Delete Record
-    $(document).on('click', '.delete-confirm', function() {
-        var url = $(this).data('url'); 
-        if(confirm('<?php echo e(trns("Are_you_sure?")); ?>')) {
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                data: {
-                    "_token": "<?php echo e(csrf_token()); ?>"
-                },
-                success: function(response) {
-                    if (response.status) {
-                        toastr.success('<?php echo e(trns("Deleted_Successfully")); ?>');
-                        table.ajax.reload();
-                    } else {
-                        toastr.error('<?php echo e(trns("Something_went_wrong")); ?>');
-                    }
-                },
-                error: function(xhr) {
-                    toastr.error('<?php echo e(trns("Something_went_wrong")); ?>');
-                }
-            });
-        }
-    });
+function deleteUser(id) {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    toastr.info("Delete functionality not implemented");
+}
 </script>
 
 
@@ -331,9 +264,11 @@ $(document).ready(function () {
             });
         });
 
+
+
         $(document).on("change", "#statusSelection", function() {
             let status = $(this).val();
-            let table = $('#usersTable').DataTable();
+            let table = $('#dataTable').DataTable();
 
             table.rows().every(function() {
                 var row = this.node();
@@ -352,4 +287,5 @@ $(document).ready(function () {
 
 
 <?php $__env->stopPush(); ?>
-<?php echo $__env->make('layouts/contentNavbarLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/content/project/index.blade.php ENDPATH**/ ?>
+
+<?php echo $__env->make('layouts/contentNavbarLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\projects\dental\resources\views/content/admin/index.blade.php ENDPATH**/ ?>

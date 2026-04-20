@@ -93,4 +93,4 @@
         </li>
 </ul>
 </aside>
-<?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/layouts/sections/menu/verticalMenu.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\projects\dental\resources\views/layouts/sections/menu/verticalMenu.blade.php ENDPATH**/ ?>

@@ -21,4 +21,4 @@
 <!-- BEGIN: Page JS-->
 <?php echo $__env->yieldContent('page-script'); ?>
 <!-- END: Page JS-->
-<?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/layouts/sections/scripts.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\projects\dental\resources\views/layouts/sections/scripts.blade.php ENDPATH**/ ?>

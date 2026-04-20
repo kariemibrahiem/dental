@@ -164,4 +164,4 @@ $(document).on('click', '.delete-confirm', function (e) {
   <!-- / Layout wrapper -->
   <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts/commonMaster' , array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/layouts/contentNavbarLayout.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts/commonMaster' , array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\projects\dental\resources\views/layouts/contentNavbarLayout.blade.php ENDPATH**/ ?>

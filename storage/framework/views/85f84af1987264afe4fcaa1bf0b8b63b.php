@@ -3,4 +3,4 @@ $width = $width ?? '25';
 $withbg = $withbg ?? '#696cff';
 ?>
 <img id="Brand-Logo" src="<?php echo e(asset('assets/img/kaiadmin/icon.png')); ?>" width="<?php echo e($width); ?>" height="auto" />
-<?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/_partials/macros.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\projects\dental\resources\views/_partials/macros.blade.php ENDPATH**/ ?>

@@ -36,4 +36,4 @@
 </body>
 
 </html>
-<?php /**PATH /home/kariem/Documents/projects/laravel_portifolio/resources/views/web/layouts/app.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\projects\dental\resources\views/web/layouts/app.blade.php ENDPATH**/ ?>

@@ -6,4 +6,4 @@
 
 <!-- Place this tag in your head or just before your close body tag. -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
-<?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/layouts/sections/scriptsIncludes.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\projects\dental\resources\views/layouts/sections/scriptsIncludes.blade.php ENDPATH**/ ?>

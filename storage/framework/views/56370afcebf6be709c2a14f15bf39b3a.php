@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', trns("Dashboard")); ?>
 
 <?php $__env->startSection('vendor-style'); ?>
@@ -651,4 +653,4 @@
 </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts/contentNavbarLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/kariem/Documents/projects/dash_1/resources/views/content/dashboard/dashboards-analytics.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts/contentNavbarLayout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\projects\dental\resources\views/content/dashboard/dashboards-analytics.blade.php ENDPATH**/ ?>

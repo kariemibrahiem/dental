@@ -3,7 +3,7 @@
 use App\Http\Controllers\Web\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomeController::class, 'index'])->name('front.home');
+Route::get('/', fn () => redirect()->route('dashboard-analytics'))->name('front.home');
 
 // Optional pages mapped to controller methods
 Route::get('/about', [HomeController::class, 'about'])->name('front.about');

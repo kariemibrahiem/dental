@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
     <style>
         .marginMain {
@@ -385,4 +387,4 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('web.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/kariem/Documents/projects/laravel_portifolio/resources/views/web/pages/home.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('web.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\projects\dental\resources\views/web/pages/home.blade.php ENDPATH**/ ?>
