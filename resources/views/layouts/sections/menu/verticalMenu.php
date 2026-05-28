@@ -46,12 +46,12 @@ return [
                 "permissions" => "user_read",
                 'slug' => 'users',
             ],
-
         ]
     ],
+
     (object)[
         'name' => 'role',
-        'icon' => 'bx bx-user',
+        'icon' => 'bx bx-shield',
         'url' => 'Role.index',
         "permissions" => "role_read",
         'slug' => 'role',
@@ -63,5 +63,29 @@ return [
                 'slug' => 'Role',
             ],
         ]
+    ],
+
+    (object)[
+        'name' => 'Doctors',
+        'icon' => 'bx bx-plus-medical',
+        'url' => 'doctors.index',
+        "permissions" => "doctors_read",
+        'slug' => 'doctors',
+    ],
+
+    (object)[
+        'name' => 'Patients',
+        'icon' => 'bx bx-user-pin',
+        'url' => 'patients.index',
+        "permissions" => "patients_read",
+        'slug' => 'patients',
+    ],
+
+    (object)[
+        'name' => 'Reports',
+        'icon' => 'bx bx-file',
+        'url' => 'reports.index',
+        "permissions" => "patients_read",
+        'slug' => 'reports',
     ],
 ];

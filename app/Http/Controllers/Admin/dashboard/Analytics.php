@@ -3,40 +3,34 @@
 namespace App\Http\Controllers\Admin\dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Models\Family;
-use App\Models\Order;
-use App\Models\Teacher;
-use App\Models\Transaction;
-use App\Models\User;
+use App\Services\Admin\DashboardService;
 use App\Traits\WeatherTrait;
 
 class Analytics extends Controller
 {
-        use WeatherTrait;
+    use WeatherTrait;
 
-    protected User $user;
-    protected Admin $admin;
+    protected DashboardService $dashboardService;
 
-    public function __construct(User $user, Admin $admin )
+    public function __construct(DashboardService $dashboardService)
     {
-        $this->user = $user;
-        $this->admin = $admin;
-        
+        $this->dashboardService = $dashboardService;
     }
 
     public function index()
     {
+        // Try to fetch weather data as fallback/extra widget (optional, keep trait usage)
+        try {
+            $weatherData = $this->GetWeather(30.5503, 31.0106);
+        } catch (\Exception $e) {
+            $weatherData = null;
+        }
 
-      
-        $data = $this->GetWeather(30.5503, 31.0106);
+        // Fetch all dental analytics from DashboardService
+        $metrics = $this->dashboardService->getMetrics();
 
-    // end charts
-        $usersCount = $this->user->count();
-        $adminsCount = $this->admin->count();
-
-
-
-        return view('content.dashboard.dashboards-analytics', compact('usersCount' , "data" , 'adminsCount',));
+        return view('content.dashboard.dashboards-analytics', array_merge($metrics, [
+            'weather' => $weatherData
+        ]));
     }
 }

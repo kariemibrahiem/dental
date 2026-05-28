@@ -93,23 +93,17 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
 
 
 
-        Route::resource('partnerss', \App\Http\Controllers\Admin\PartnersController::class);
-        Route::post('/partnerss/updateColumnSelected', [\App\Http\Controllers\Admin\PartnersController::class, 'updateColumnSelected'])
-            ->name('partnerss.updateColumnSelected');
-        Route::post('/partnerss/destroySelected', [\App\Http\Controllers\Admin\PartnersController::class, 'destroySelected'])
-            ->name('partnerss.destroySelected');
+        Route::resource('doctors', \App\Http\Controllers\Admin\DoctorController::class);
+        Route::post('/doctors/destroySelected', [\App\Http\Controllers\Admin\DoctorController::class, 'deleteSelected'])
+            ->name('doctors.destroySelected');
 
-        Route::resource('collaborations', \App\Http\Controllers\Admin\CollaborationController::class);
-        Route::post('/collaborations/updateColumnSelected', [\App\Http\Controllers\Admin\CollaborationController::class, 'updateColumnSelected'])
-            ->name('collaborations.updateColumnSelected');
-        Route::post('/collaborations/destroySelected', [\App\Http\Controllers\Admin\CollaborationController::class, 'destroySelected'])
-            ->name('collaborations.destroySelected');
+        Route::resource('patients', \App\Http\Controllers\Admin\PatientController::class);
+        Route::post('/patients/destroySelected', [\App\Http\Controllers\Admin\PatientController::class, 'deleteSelected'])
+            ->name('patients.destroySelected');
 
-        Route::resource('Backprojects', \App\Http\Controllers\Admin\ProjectController::class);
-        Route::post('/Backprojects/updateColumnSelected', [\App\Http\Controllers\Admin\ProjectController::class, 'updateColumnSelected'])
-            ->name('Backprojects.updateColumnSelected');
-        Route::post('/Backprojects/destroySelected', [\App\Http\Controllers\Admin\ProjectController::class, 'destroySelected'])
-            ->name('Backprojects.destroySelected');
+        Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class);
+        Route::post('/reports/destroySelected', [\App\Http\Controllers\Admin\ReportController::class, 'destroySelected'])
+            ->name('reports.destroySelected');
 
 
         Route::resource('settings', \App\Http\Controllers\Admin\SettingController::class);

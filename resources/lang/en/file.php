@@ -3704,4 +3704,6 @@ Stack Trace:
   'partner_id' => 'Partner Id',
   'partner' => 'Partner',
   'Visit' => 'Visit',
+  'Doctors' => 'Doctors',
+  'Patients' => 'Patients',
 );
