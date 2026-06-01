@@ -10,7 +10,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-primary fw-bold">Welcome back, Administrator! 🎉</h5>
                         <p class="mb-4">
-                            The AI Dental clinic system is running smoothly. We detected <span class="fw-bold"><?php echo e($infection_count); ?> critical infection cases</span> that require immediate attention.
+                            The AI Dental clinic system is running smoothly. We detected <span class="fw-bold"><?php echo e($infection_count); ?> disease cases</span> that require clinical review.
                         </p>
                         <a href="<?php echo e(route('patients.index')); ?>" class="btn btn-sm btn-primary">Manage Patients</a>
                     </div>
@@ -64,40 +64,40 @@
                 </div>
                 <span class="d-block mb-1 text-success font-weight-bold">Healthy</span>
                 <h3 class="card-title mb-2 fw-bold text-success"><?php echo e($healthy_count); ?></h3>
-                <small class="text-success fw-semibold">No issues detected</small>
+                <small class="text-success fw-semibold">No issues</small>
             </div>
         </div>
     </div>
 
-    <!-- Cavity Cases -->
+    <!-- Caries Cases -->
     <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="card text-center h-100 shadow-sm border-0 bg-label-warning">
             <div class="card-body">
                 <div class="badge p-3 bg-warning rounded-circle mb-3 text-white">
                     <i class="bx bx-meh fs-3"></i>
                 </div>
-                <span class="d-block mb-1 text-warning font-weight-bold">Cavity</span>
-                <h3 class="card-title mb-2 fw-bold text-warning"><?php echo e($cavity_count); ?></h3>
-                <small class="text-warning fw-semibold">Mild risk</small>
+                <span class="d-block mb-1 text-warning font-weight-bold">Caries</span>
+                <h3 class="card-title mb-2 fw-bold text-warning"><?php echo e($caries_count); ?></h3>
+                <small class="text-warning fw-semibold">Cavities detected</small>
             </div>
         </div>
     </div>
 
-    <!-- Infection Cases -->
+    <!-- Diseases / Critical Cases -->
     <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="card text-center h-100 shadow-sm border-0 bg-label-danger">
             <div class="card-body">
                 <div class="badge p-3 bg-danger rounded-circle mb-3 text-white">
                     <i class="bx bx-sad fs-3"></i>
                 </div>
-                <span class="d-block mb-1 text-danger font-weight-bold">Infection</span>
+                <span class="d-block mb-1 text-danger font-weight-bold">Active Diseases</span>
                 <h3 class="card-title mb-2 fw-bold text-danger"><?php echo e($infection_count); ?></h3>
-                <small class="text-danger fw-semibold">High risk / Critical</small>
+                <small class="text-danger fw-semibold">Require attention</small>
             </div>
         </div>
     </div>
 
-    <!-- Weather Widget (Fallback) -->
+    <!-- Clinic Feeds -->
     <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="card text-center h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column justify-content-center align-items-center">
@@ -157,7 +157,7 @@
         <!-- Critical Alerts -->
         <div class="card mb-4 border-0 shadow-sm">
             <div class="card-header bg-danger text-white d-flex align-items-center justify-content-between">
-                <h5 class="card-title mb-0 text-white fw-bold"><i class="bx bx-error-circle me-1"></i> Critical Alerts</h5>
+                <h5 class="card-title mb-0 text-white fw-bold"><i class="bx bx-error-circle me-1"></i> Active Disease Alerts</h5>
                 <span class="badge bg-white text-danger fw-bold"><?php echo e(count($alerts)); ?> cases</span>
             </div>
             <div class="card-body pt-3" style="max-height: 250px; overflow-y: auto;">
@@ -176,7 +176,7 @@
                 <?php else: ?>
                     <div class="text-center py-4">
                         <i class="bx bx-badge-check text-success fs-1 mb-2"></i>
-                        <p class="mb-0 text-muted">No critical cases detected!</p>
+                        <p class="mb-0 text-muted">No diseases detected!</p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 2. Cases Distribution Chart
+    // 2. Cases Distribution Chart (7 classifications)
     const casesCtx = document.getElementById('casesDistributionChart').getContext('2d');
     new Chart(casesCtx, {
         type: 'doughnut',
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: <?php echo json_encode($charts['cases_distribution']['labels']); ?>,
             datasets: [{
                 data: <?php echo json_encode($charts['cases_distribution']['data']); ?>,
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                backgroundColor: ['#28a745', '#6f42c1', '#fd7e14', '#e83e8c', '#20c997', '#007bff', '#dc3545'],
                 borderWidth: 1
             }]
         },

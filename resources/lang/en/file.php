@@ -3706,4 +3706,5 @@ Stack Trace:
   'Visit' => 'Visit',
   'Doctors' => 'Doctors',
   'Patients' => 'Patients',
+  'Reports' => 'Reports',
 );
