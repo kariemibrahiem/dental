@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Models\Doctor as ObjModel;
 use App\Models\Activity;
 use App\Services\BaseService;
+use App\Support\IdentityGenerator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
@@ -56,6 +57,9 @@ class DoctorService extends BaseService
     public function store($data)
     {
         try {
+            $data['email'] = $data['email'] ?? IdentityGenerator::uniqueEmail(ObjModel::class, $data['name'] ?? 'doctor', 'doctor');
+            $data['password'] = $data['password'] ?? IdentityGenerator::temporaryPassword();
+
             $model = $this->createData(
                 collect($data)->only($this->model->getFillable())->toArray()
             );

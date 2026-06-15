@@ -9,6 +9,7 @@ use App\Models\Scan;
 use App\Models\Activity;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Support\DentalCaseCatalog;
 
 class PatientDashboardController extends Controller
 {
@@ -25,21 +26,34 @@ class PatientDashboardController extends Controller
             return $this->errorResponse([], 'Unauthorized or not a patient', 401);
         }
 
-        // Diagnostic counts
-        $totalScans = Scan::where('patient_id', $patient->id)->count();
-        $healthyScans = Scan::where('patient_id', $patient->id)->where('ai_result', 'Healthy')->count();
-        $riskScans = Scan::where('patient_id', $patient->id)->whereIn('ai_result', ['Calculus', 'Caries', 'Gingivitis', 'Hypodontia', 'Tooth Discoloration', 'Ulcers'])->count();
-
-        // Scan history
         $scans = Scan::where('patient_id', $patient->id)->latest()->get();
+        $totalScans = $scans->count();
+        $healthyScans = $scans->filter(fn ($scan) => DentalCaseCatalog::normalize($scan->ai_result) === DentalCaseCatalog::HEALTHY)->count();
+        $cavityScans = $scans->filter(fn ($scan) => DentalCaseCatalog::normalize($scan->ai_result) === DentalCaseCatalog::CAVITY)->count();
+        $infectionScans = $scans->filter(fn ($scan) => DentalCaseCatalog::normalize($scan->ai_result) === DentalCaseCatalog::INFECTION)->count();
 
         return $this->successResponse([
             'stats' => [
                 'total_scans' => $totalScans,
                 'healthy_scans' => $healthyScans,
-                'risk_scans' => $riskScans,
+                'cavity_scans' => $cavityScans,
+                'infection_scans' => $infectionScans,
+                'risk_scans' => $cavityScans + $infectionScans,
             ],
-            'scans' => $scans,
+            'scans' => $scans->map(function ($scan) {
+                return [
+                    'id' => $scan->id,
+                    'image_path' => $scan->image_path,
+                    'ai_result' => $scan->ai_result,
+                    'display_result' => DentalCaseCatalog::normalize($scan->ai_result),
+                    'confidence_score' => $scan->confidence_score,
+                    'notes' => $scan->notes,
+                    'doctor_id' => $scan->doctor_id,
+                    'status' => $scan->status,
+                    'created_at' => $scan->created_at?->toDateTimeString(),
+                    'updated_at' => $scan->updated_at?->toDateTimeString(),
+                ];
+            })->values(),
             'doctor' => $patient->doctor ? $patient->doctor->load('specialties') : null,
         ], 'Patient dashboard data retrieved successfully');
     }

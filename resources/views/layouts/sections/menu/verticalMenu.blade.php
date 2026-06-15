@@ -15,6 +15,14 @@
 
     @php
         $menuData = include resource_path('views/layouts/sections/menu/verticalMenu.php');
+        $adminUser = \Illuminate\Support\Facades\Auth::guard('admin')->user();
+        $adminCanAccess = function ($item) use ($adminUser) {
+            if (!$adminUser || !isset($item->permissions)) {
+                return false;
+            }
+
+            return $adminUser->hasRole('super_admin') || $adminUser->can($item->permissions);
+        };
     @endphp
 
     <div class="menu-inner-shadow"></div>
@@ -49,7 +57,7 @@
                     }
                 @endphp
 
-                @if ($menu->permissions === 'dashboard' || (auth()->check() && auth()->user()->can($menu->permissions)))
+                @if ($menu->permissions === 'dashboard' || $adminCanAccess($menu))
                     <li class="menu-item {{ $activeClass }}">
                         <a href="{{ isset($menu->url) && Route::has($menu->url) ? route($menu->url) : 'javascript:void(0);' }}"
                             class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
@@ -73,7 +81,7 @@
                                                 ? 'active'
                                                 : '';
                                     @endphp
-                                    @if (auth()->user()->can($submenu->permissions))
+                                    @if ($adminCanAccess($submenu))
                                         <li class="menu-item {{ $subActiveClass }}">
                                             <a href="{{ Route::has($submenu->url) ? route($submenu->url) : 'javascript:void(0);' }}" class="menu-link">
                                                 <div>{{ trns($submenu->name) }}</div>

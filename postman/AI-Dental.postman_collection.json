@@ -1,0 +1,518 @@
+{
+  "info": {
+    "_postman_id": "a4ae41a3-f696-44c0-818e-d782eb365efe",
+    "name": "AI Dental",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Clinic Auth",
+      "item": [
+        {
+          "name": "Clinic Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"clinic\",\n  \"password\": \"clinic123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login"
+          }
+        },
+        {
+          "name": "Clinic Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/me"
+          }
+        },
+        {
+          "name": "Clinic Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lookups",
+      "item": [
+        {
+          "name": "Case Results",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/lookups/case-results"
+          }
+        },
+        {
+          "name": "Specialties",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/specialties"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Clinic Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/dashboard"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctors",
+      "item": [
+        {
+          "name": "List Doctors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/doctors"
+          }
+        },
+        {
+          "name": "Create Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mostafa\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/doctors"
+          }
+        },
+        {
+          "name": "Show Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/doctors/1"
+          }
+        },
+        {
+          "name": "Update Doctor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mostafa Updated\",\n  \"phone\": \"01011111111\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/doctors/1"
+          }
+        },
+        {
+          "name": "Delete Doctor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/doctors/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "List Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patients"
+          }
+        },
+        {
+          "name": "Create Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed\",\n  \"doctor_id\": 1,\n  \"result\": \"Healthy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/patients"
+          }
+        },
+        {
+          "name": "Show Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patients/1"
+          }
+        },
+        {
+          "name": "Update Patient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctor_id\": 2,\n  \"result\": \"Infection\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/patients/1"
+          }
+        },
+        {
+          "name": "Delete Patient",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patients/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Reception\",\n  \"phone\": \"01512345678\",\n  \"email\": \"reception@clinic.com\",\n  \"password\": \"secret123\",\n  \"status\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/users"
+          }
+        },
+        {
+          "name": "Show User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users/1"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Reception Updated\",\n  \"status\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/users/1"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patient App",
+      "item": [
+        {
+          "name": "Patient Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmed@gmail.com\",\n  \"password\": \"patient123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/patient/login"
+          }
+        },
+        {
+          "name": "Patient Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Patient\",\n  \"email\": \"new.patient@example.com\",\n  \"phone\": \"01100000000\",\n  \"password\": \"patient123\",\n  \"doctor_id\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/patient/register"
+          }
+        },
+        {
+          "name": "Patient Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patient/profile"
+          }
+        },
+        {
+          "name": "Patient Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patient/dashboard"
+          }
+        },
+        {
+          "name": "List Patient Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patient/reports"
+          }
+        },
+        {
+          "name": "Show Patient Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/patient/reports/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctor App",
+      "item": [
+        {
+          "name": "Doctor Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"mostafa@dental.com\",\n  \"password\": \"doctor123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/doctor/login"
+          }
+        },
+        {
+          "name": "Doctor Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_DOCTOR_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/doctor/profile"
+          }
+        },
+        {
+          "name": "Doctor Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_DOCTOR_TOKEN"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/doctor/dashboard"
+          }
+        },
+        {
+          "name": "Review Scan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REPLACE_WITH_DOCTOR_TOKEN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Needs follow-up check\",\n  \"override_result\": \"Cavity\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/doctor/scans/1/review"
+          }
+        }
+      ]
+    }
+  ]
+}

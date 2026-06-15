@@ -85,7 +85,7 @@ return [
         'name' => 'Reports',
         'icon' => 'bx bx-file',
         'url' => 'reports.index',
-        "permissions" => "patients_read",
+        "permissions" => "reports_read",
         'slug' => 'reports',
     ],
 ];

@@ -9,6 +9,8 @@ use App\Models\Scan;
 use App\Models\Patient;
 use App\Models\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Support\DentalCaseCatalog;
 
 class DoctorDashboardController extends Controller
 {
@@ -68,7 +70,7 @@ class DoctorDashboardController extends Controller
 
         $request->validate([
             'notes' => 'required|string|min:5',
-            'override_result' => 'nullable|in:Healthy,Cavity,Infection',
+            'override_result' => ['nullable', Rule::in(DentalCaseCatalog::allResults())],
         ]);
 
         $scan = Scan::where('id', $id)->where('doctor_id', $doctor->id)->first();
@@ -89,7 +91,7 @@ class DoctorDashboardController extends Controller
                 // Also update patient primary result cache
                 if ($scan->patient) {
                     $scan->patient->update([
-                        'result' => $request->override_result
+                        'result' => DentalCaseCatalog::normalize($request->override_result)
                     ]);
                 }
             }

@@ -5,54 +5,46 @@ namespace App\Services\Admin;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Activity;
+use App\Support\DentalCaseCatalog;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
     public function getMetrics()
     {
-        $totalPatients = Patient::count();
+        $patients = Patient::with('doctor')->get();
+        $totalPatients = $patients->count();
         $totalDoctors = Doctor::count();
-        
-        $healthyCount = Patient::where('result', 'Healthy')->count();
-        $calculusCount = Patient::where('result', 'Calculus')->count();
-        $cariesCount = Patient::where('result', 'Caries')->count();
-        $gingivitisCount = Patient::where('result', 'Gingivitis')->count();
-        $hypodontiaCount = Patient::where('result', 'Hypodontia')->count();
-        $discolorationCount = Patient::where('result', 'Tooth Discoloration')->count();
-        $ulcersCount = Patient::where('result', 'Ulcers')->count();
 
-        // General disease counts for KPI badge alerts
-        $infectionCount = Patient::whereIn('result', ['Calculus', 'Caries', 'Gingivitis', 'Hypodontia', 'Tooth Discoloration', 'Ulcers'])->count();
+        $healthyCount = $patients->filter(
+            fn ($patient) => DentalCaseCatalog::normalize($patient->result) === DentalCaseCatalog::HEALTHY
+        )->count();
+        $cavityCount = $patients->filter(
+            fn ($patient) => DentalCaseCatalog::normalize($patient->result) === DentalCaseCatalog::CAVITY
+        )->count();
+        $infectionCount = $patients->filter(
+            fn ($patient) => DentalCaseCatalog::normalize($patient->result) === DentalCaseCatalog::INFECTION
+        )->count();
 
-        // 1. Daily Patients (Last 7 days of entries)
-        $dailyPatientsRaw = Patient::select('date', DB::raw('count(*) as count'))
-            ->whereNotNull('date')
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
+        $dailyPatientsRaw = $patients
+            ->filter(fn ($patient) => !empty($patient->date))
+            ->groupBy(fn ($patient) => Carbon::parse($patient->date)->format('Y-m-d'))
+            ->sortKeys();
 
-        $dailyLabels = [];
-        $dailyData = [];
-        foreach ($dailyPatientsRaw as $dp) {
-            $dailyLabels[] = Carbon::parse($dp->date)->format('M d');
-            $dailyData[] = (int) $dp->count;
-        }
+        $dailyLabels = $dailyPatientsRaw
+            ->keys()
+            ->map(fn ($date) => Carbon::parse($date)->format('M d'))
+            ->values()
+            ->all();
 
-        // 2. Cases Distribution (Supports all 6 diseases + Healthy)
-        $casesLabels = ['Healthy', 'Calculus', 'Caries', 'Gingivitis', 'Hypodontia', 'Discoloration', 'Ulcers'];
-        $casesData = [
-            $healthyCount, 
-            $calculusCount, 
-            $cariesCount, 
-            $gingivitisCount, 
-            $hypodontiaCount, 
-            $discolorationCount, 
-            $ulcersCount
-        ];
+        $dailyData = $dailyPatientsRaw
+            ->map(fn ($group) => $group->count())
+            ->values()
+            ->all();
 
-        // 3. Patients by Doctor
+        $casesLabels = DentalCaseCatalog::frontResults();
+        $casesData = [$healthyCount, $cavityCount, $infectionCount];
+
         $patientsByDocRaw = Doctor::withCount('patients')->get();
         $docLabels = [];
         $docData = [];
@@ -61,22 +53,21 @@ class DashboardService
             $docData[] = $doc->patients_count;
         }
 
-        // 4. Alerts (Critical cases = any active disease other than Healthy)
-        $criticalCases = Patient::with('doctor')
-            ->whereIn('result', ['Calculus', 'Caries', 'Gingivitis', 'Hypodontia', 'Tooth Discoloration', 'Ulcers'])
-            ->orderBy('date', 'desc')
-            ->get()
+        $criticalCases = $patients
+            ->filter(fn ($patient) => DentalCaseCatalog::isCritical($patient->result))
+            ->sortByDesc(fn ($patient) => $patient->date ? Carbon::parse($patient->date)->timestamp : $patient->created_at?->timestamp)
             ->map(function ($patient) {
                 return [
                     'id' => $patient->id,
                     'name' => $patient->name,
                     'doctor' => $patient->doctor ? $patient->doctor->name : '-',
                     'date' => $patient->date ? Carbon::parse($patient->date)->format('Y-m-d') : '-',
-                    'result' => $patient->result,
+                    'result' => DentalCaseCatalog::normalize($patient->result),
+                    'raw_result' => $patient->result,
                 ];
-            });
+            })
+            ->values();
 
-        // 5. Recent Activity
         $recentActivities = Activity::orderBy('created_at', 'desc')
             ->take(10)
             ->get()
@@ -89,17 +80,32 @@ class DashboardService
                 ];
             });
 
+        $doctorStatistics = Doctor::withCount('patients')
+            ->orderByDesc('patients_count')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($doctor) {
+                return [
+                    'id' => $doctor->id,
+                    'name' => $doctor->name,
+                    'patients_count' => $doctor->patients_count,
+                ];
+            })
+            ->values();
+
         return [
+            'stats' => [
+                'total_patients' => $totalPatients,
+                'total_doctors' => $totalDoctors,
+                'healthy' => $healthyCount,
+                'cavity' => $cavityCount,
+                'infection' => $infectionCount,
+            ],
             'total_patients' => $totalPatients,
             'total_doctors' => $totalDoctors,
             'healthy_count' => $healthyCount,
-            'calculus_count' => $calculusCount,
-            'caries_count' => $cariesCount,
-            'gingivitis_count' => $gingivitisCount,
-            'hypodontia_count' => $hypodontiaCount,
-            'discoloration_count' => $discolorationCount,
-            'ulcers_count' => $ulcersCount,
-            'infection_count' => $infectionCount, // general critical alerts
+            'cavity_count' => $cavityCount,
+            'infection_count' => $infectionCount,
             'charts' => [
                 'daily_patients' => [
                     'labels' => $dailyLabels,
@@ -115,7 +121,10 @@ class DashboardService
                 ],
             ],
             'alerts' => $criticalCases,
+            'recent_activity' => $recentActivities,
             'recent_activities' => $recentActivities,
+            'doctor_statistics' => $doctorStatistics,
+            'case_results' => DentalCaseCatalog::frontResults(),
         ];
     }
 }

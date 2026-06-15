@@ -9,8 +9,10 @@ use App\Models\Patient;
 use App\Models\Scan;
 use App\Models\Report;
 use App\Models\Activity;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,16 +28,29 @@ class DatabaseSeeder extends Seeder
         ]);
      
         // 1. Create Web Panel Admin account
-        Admin::create([
-            "user_name" => "admin",
-            "email" => "admin@admin.com",
-            "password" => "admin",
-            "code" => "admin",
-            "phone" => "01000000000",
-            "image" => "testImage"
-        ]);
+        $admin = Admin::updateOrCreate(
+            ["email" => "admin@admin.com"],
+            [
+                "user_name" => "admin",
+                "password" => "admin",
+                "code" => "admin",
+                "phone" => "01000000000",
+                "image" => "testImage"
+            ]
+        );
 
-        Admin::latest()->first()->assignRole("super_admin");
+        $admin->syncRoles(["super_admin"]);
+
+        User::updateOrCreate(
+            ['phone' => '01500000000'],
+            [
+                'name' => 'clinic',
+                'email' => 'clinic@ai-dental.local',
+                'password' => 'clinic123',
+                'code' => Str::upper(Str::random(10)),
+                'status' => 1,
+            ]
+        );
 
         // 2. Seed Dental Specialties
         $ortho = Specialty::create(['name' => 'Orthodontics']);

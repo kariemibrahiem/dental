@@ -4,11 +4,13 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiTrait;
+use App\Http\Traits\RequiresClinicUser;
 use App\Services\Admin\DashboardService;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
-    use ApiTrait;
+    use ApiTrait, RequiresClinicUser;
 
     protected DashboardService $dashboardService;
 
@@ -22,6 +24,11 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $actor = $this->requireClinicUser();
+        if (!$actor instanceof User) {
+            return $actor;
+        }
+
         try {
             $metrics = $this->dashboardService->getMetrics();
             return $this->successResponse($metrics, 'Dashboard metrics retrieved successfully');

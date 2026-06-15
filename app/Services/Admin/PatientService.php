@@ -6,6 +6,8 @@ use App\Models\Patient as ObjModel;
 use App\Models\Activity;
 use App\Models\Doctor;
 use App\Services\BaseService;
+use App\Support\DentalCaseCatalog;
+use App\Support\IdentityGenerator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
@@ -65,6 +67,10 @@ class PatientService extends BaseService
             if (empty($data['date'])) {
                 $data['date'] = Carbon::today()->toDateString();
             }
+
+            $data['email'] = $data['email'] ?? IdentityGenerator::uniqueEmail(ObjModel::class, $data['name'] ?? 'patient', 'patient');
+            $data['password'] = $data['password'] ?? IdentityGenerator::temporaryPassword();
+            $data['result'] = DentalCaseCatalog::normalize($data['result'] ?? DentalCaseCatalog::HEALTHY);
 
             $model = $this->createData(
                 collect($data)->only($this->model->getFillable())->toArray()

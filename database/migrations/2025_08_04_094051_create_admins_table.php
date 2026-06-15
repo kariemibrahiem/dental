@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string("phone");
             $table->string("email");
             $table->string("code");
-            $table->integer("otp")->default()->nullable();
+            $table->integer("otp")->nullable();
             $table->string("image")->nullable()->default(null);
             $table->timestamps();
         });

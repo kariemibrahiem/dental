@@ -11,6 +11,7 @@ enum PermissionEnums: string
     case USERs = "users";
     case DOCTORs = "doctors";
     case PATIENTs = "patients";
+    case REPORTs = "reports";
 
 
 

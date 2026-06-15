@@ -151,6 +151,9 @@ class AdminService extends BaseService
         $oldObj = $this->getById($id);
 
         try {
+            $roleId = $data['role_id'] ?? null;
+            unset($data['role_id']);
+
             if($data['password'] == null){
                 $data = Arr::except($data, ['password']);
             } else {
@@ -168,6 +171,13 @@ class AdminService extends BaseService
 
 
             $this->updateData($id, $data);
+
+            if ($roleId) {
+                $role = $this->roleModel->find($roleId);
+                if ($role) {
+                    $oldObj->syncRoles([$role->name]);
+                }
+            }
 
             if (request()->ajax()) {
                 return response()->json(['status' => 200, 'message' => "تمت العملية بنجاح"]);
