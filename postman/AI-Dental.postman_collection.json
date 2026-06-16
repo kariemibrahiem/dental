@@ -8,17 +8,124 @@
     {
       "key": "baseUrl",
       "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "clinicToken",
+      "value": "REPLACE_WITH_CLINIC_TOKEN"
+    },
+    {
+      "key": "patientToken",
+      "value": "REPLACE_WITH_PATIENT_TOKEN"
+    },
+    {
+      "key": "doctorToken",
+      "value": "REPLACE_WITH_DOCTOR_TOKEN"
+    },
+    {
+      "key": "doctorId",
+      "value": "1"
+    },
+    {
+      "key": "patientId",
+      "value": "1"
+    },
+    {
+      "key": "reportId",
+      "value": "1"
+    },
+    {
+      "key": "reservationId",
+      "value": "1"
+    },
+    {
+      "key": "scanId",
+      "value": "1"
     }
   ],
   "item": [
+    {
+      "name": "Lookups",
+      "item": [
+        {
+          "name": "List Doctors Public",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/doctors/list"
+          }
+        },
+        {
+          "name": "List Specialties",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/specialties"
+          }
+        },
+        {
+          "name": "List Case Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/lookups/case-results"
+          }
+        },
+        {
+          "name": "List Reservation Statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/lookups/reservation-statuses"
+          }
+        }
+      ]
+    },
     {
       "name": "Clinic Auth",
       "item": [
         {
           "name": "Clinic Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.token) {",
+                  "  pm.collectionVariables.set('clinicToken', json.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -37,8 +144,12 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/auth/me"
@@ -50,8 +161,12 @@
             "method": "POST",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/auth/logout"
@@ -60,26 +175,7 @@
       ]
     },
     {
-      "name": "Lookups",
-      "item": [
-        {
-          "name": "Case Results",
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/v1/lookups/case-results"
-          }
-        },
-        {
-          "name": "Specialties",
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/v1/specialties"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Dashboard",
+      "name": "Clinic Dashboard",
       "item": [
         {
           "name": "Clinic Dashboard",
@@ -87,8 +183,12 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/dashboard"
@@ -97,7 +197,7 @@
       ]
     },
     {
-      "name": "Doctors",
+      "name": "Clinic Doctors",
       "item": [
         {
           "name": "List Doctors",
@@ -105,8 +205,12 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/doctors"
@@ -114,12 +218,30 @@
         },
         {
           "name": "Create Doctor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.doctor?.id) {",
+                  "  pm.collectionVariables.set('doctorId', json.data.doctor.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               },
               {
                 "key": "Content-Type",
@@ -128,7 +250,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Mostafa\"\n}"
+              "raw": "{\n  \"name\": \"Mostafa\",\n  \"email\": \"mostafa@dental.com\",\n  \"phone\": \"01011111111\",\n  \"password\": \"doctor123\",\n  \"specialty_ids\": [1]\n}"
             },
             "url": "{{baseUrl}}/api/v1/doctors"
           }
@@ -139,11 +261,15 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/doctors/1"
+            "url": "{{baseUrl}}/api/v1/doctors/{{doctorId}}"
           }
         },
         {
@@ -152,8 +278,12 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               },
               {
                 "key": "Content-Type",
@@ -162,9 +292,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Mostafa Updated\",\n  \"phone\": \"01011111111\"\n}"
+              "raw": "{\n  \"name\": \"Mostafa Updated\",\n  \"phone\": \"01022222222\",\n  \"specialty_ids\": [1]\n}"
             },
-            "url": "{{baseUrl}}/api/v1/doctors/1"
+            "url": "{{baseUrl}}/api/v1/doctors/{{doctorId}}"
           }
         },
         {
@@ -173,17 +303,21 @@
             "method": "DELETE",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/doctors/1"
+            "url": "{{baseUrl}}/api/v1/doctors/{{doctorId}}"
           }
         }
       ]
     },
     {
-      "name": "Patients",
+      "name": "Clinic Patients",
       "item": [
         {
           "name": "List Patients",
@@ -191,8 +325,12 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/patients"
@@ -200,12 +338,30 @@
         },
         {
           "name": "Create Patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.patient?.id) {",
+                  "  pm.collectionVariables.set('patientId', json.data.patient.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               },
               {
                 "key": "Content-Type",
@@ -214,7 +370,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Ahmed\",\n  \"doctor_id\": 1,\n  \"result\": \"Healthy\"\n}"
+              "raw": "{\n  \"name\": \"Ahmed\",\n  \"doctor_id\": {{doctorId}},\n  \"result\": \"Healthy\",\n  \"email\": \"ahmed@example.com\",\n  \"phone\": \"01033333333\",\n  \"password\": \"patient123\"\n}"
             },
             "url": "{{baseUrl}}/api/v1/patients"
           }
@@ -225,11 +381,15 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/patients/1"
+            "url": "{{baseUrl}}/api/v1/patients/{{patientId}}"
           }
         },
         {
@@ -238,8 +398,12 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               },
               {
                 "key": "Content-Type",
@@ -248,9 +412,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"doctor_id\": 2,\n  \"result\": \"Infection\"\n}"
+              "raw": "{\n  \"doctor_id\": {{doctorId}},\n  \"result\": \"Infection\",\n  \"phone\": \"01044444444\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/patients/1"
+            "url": "{{baseUrl}}/api/v1/patients/{{patientId}}"
           }
         },
         {
@@ -259,17 +423,21 @@
             "method": "DELETE",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/patients/1"
+            "url": "{{baseUrl}}/api/v1/patients/{{patientId}}"
           }
         }
       ]
     },
     {
-      "name": "Users",
+      "name": "Clinic Users",
       "item": [
         {
           "name": "List Users",
@@ -277,8 +445,12 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/users"
@@ -290,8 +462,12 @@
             "method": "POST",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               },
               {
                 "key": "Content-Type",
@@ -311,8 +487,12 @@
             "method": "GET",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/users/1"
@@ -324,8 +504,12 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               },
               {
                 "key": "Content-Type",
@@ -345,8 +529,12 @@
             "method": "DELETE",
             "header": [
               {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
                 "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_TOKEN"
+                "value": "Bearer {{clinicToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/users/1"
@@ -358,90 +546,515 @@
       "name": "Patient App",
       "item": [
         {
-          "name": "Patient Login",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Patient Register",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json?.data?.token) pm.collectionVariables.set('patientToken', json.data.token);",
+                      "if (json?.data?.patient?.id) pm.collectionVariables.set('patientId', json.data.patient.id);",
+                      "if (json?.data?.patient?.doctor_id) pm.collectionVariables.set('doctorId', json.data.patient.doctor_id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ahmed Patient\",\n  \"email\": \"ahmed.patient@example.com\",\n  \"phone\": \"01055555555\",\n  \"password\": \"patient123\",\n  \"doctor_id\": {{doctorId}}\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/auth/patient/register"
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"ahmed@gmail.com\",\n  \"password\": \"patient123\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/auth/patient/login"
-          }
-        },
-        {
-          "name": "Patient Register",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+            {
+              "name": "Patient Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json?.data?.token) pm.collectionVariables.set('patientToken', json.data.token);",
+                      "if (json?.data?.patient?.id) pm.collectionVariables.set('patientId', json.data.patient.id);",
+                      "if (json?.data?.patient?.doctor_id) pm.collectionVariables.set('doctorId', json.data.patient.doctor_id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"patient123\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/auth/patient/login"
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"New Patient\",\n  \"email\": \"new.patient@example.com\",\n  \"phone\": \"01100000000\",\n  \"password\": \"patient123\",\n  \"doctor_id\": 1\n}"
             },
-            "url": "{{baseUrl}}/api/v1/auth/patient/register"
-          }
+            {
+              "name": "Patient Logout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/logout"
+              }
+            }
+          ]
         },
         {
-          "name": "Patient Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Patient Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/profile"
               }
-            ],
-            "url": "{{baseUrl}}/api/v1/patient/profile"
-          }
+            },
+            {
+              "name": "Update Patient Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ahmed Updated\",\n  \"phone\": \"01066666666\",\n  \"doctor_id\": {{doctorId}}\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/patient/profile"
+              }
+            },
+            {
+              "name": "Update Patient Password",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current_password\": \"patient123\",\n  \"new_password\": \"patient1234\",\n  \"new_password_confirmation\": \"patient1234\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/patient/password"
+              }
+            },
+            {
+              "name": "Patient Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/statistics"
+              }
+            },
+            {
+              "name": "Patient Doctor List",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/doctors"
+              }
+            },
+            {
+              "name": "Delete Patient Account",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/account"
+              }
+            }
+          ]
         },
         {
-          "name": "Patient Dashboard",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Patient Dashboard",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/dashboard"
               }
-            ],
-            "url": "{{baseUrl}}/api/v1/patient/dashboard"
-          }
+            },
+            {
+              "name": "Upload Scan",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": ""
+                    }
+                  ]
+                },
+                "url": "{{baseUrl}}/api/v1/patient/scans/upload"
+              }
+            }
+          ]
         },
         {
-          "name": "List Patient Reports",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+          "name": "Reports",
+          "item": [
+            {
+              "name": "List My Reports",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/reports"
               }
-            ],
-            "url": "{{baseUrl}}/api/v1/patient/reports"
-          }
+            },
+            {
+              "name": "Upload Report",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json?.data?.id) pm.collectionVariables.set('reportId', json.data.id);",
+                      "if (json?.data?.doctor_id) pm.collectionVariables.set('doctorId', json.data.doctor_id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Panorama Report",
+                      "type": "text"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Patient uploaded a new dental report for doctor review.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "doctor_id",
+                      "value": "{{doctorId}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": ""
+                    }
+                  ]
+                },
+                "url": "{{baseUrl}}/api/v1/patient/reports"
+              }
+            },
+            {
+              "name": "Show My Report",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/reports/{{reportId}}"
+              }
+            }
+          ]
         },
         {
-          "name": "Show Patient Report",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_PATIENT_TOKEN"
+          "name": "Reservations",
+          "item": [
+            {
+              "name": "List My Reservations",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/reservations"
               }
-            ],
-            "url": "{{baseUrl}}/api/v1/patient/reports/1"
-          }
+            },
+            {
+              "name": "Create Reservation",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json?.data?.id) pm.collectionVariables.set('reservationId', json.data.id);",
+                      "if (json?.data?.doctor_id) pm.collectionVariables.set('doctorId', json.data.doctor_id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "doctor_id",
+                      "value": "{{doctorId}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "title",
+                      "value": "Follow-up Reservation",
+                      "type": "text"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Patient wants to reserve a follow-up visit.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "reservation_time",
+                      "value": "2026-06-20 14:00:00",
+                      "type": "text"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": ""
+                    }
+                  ]
+                },
+                "url": "{{baseUrl}}/api/v1/patient/reservations"
+              }
+            },
+            {
+              "name": "Show My Reservation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/reservations/{{reservationId}}"
+              }
+            },
+            {
+              "name": "Update My Reservation",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Updated Follow-up Reservation",
+                      "type": "text"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Updated reservation details from patient.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "reservation_time",
+                      "value": "2026-06-21 11:30:00",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": "{{baseUrl}}/api/v1/patient/reservations/{{reservationId}}"
+              }
+            },
+            {
+              "name": "Cancel My Reservation",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patientToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/patient/reservations/{{reservationId}}"
+              }
+            }
+          ]
         }
       ]
     },
@@ -449,68 +1062,393 @@
       "name": "Doctor App",
       "item": [
         {
-          "name": "Doctor Login",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Doctor Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json?.data?.token) pm.collectionVariables.set('doctorToken', json.data.token);",
+                      "if (json?.data?.doctor?.id) pm.collectionVariables.set('doctorId', json.data.doctor.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"mostafa@dental.com\",\n  \"password\": \"doctor123\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/auth/doctor/login"
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"mostafa@dental.com\",\n  \"password\": \"doctor123\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/auth/doctor/login"
-          }
+            {
+              "name": "Doctor Logout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/logout"
+              }
+            }
+          ]
         },
         {
-          "name": "Doctor Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_DOCTOR_TOKEN"
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Doctor Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/profile"
               }
-            ],
-            "url": "{{baseUrl}}/api/v1/doctor/profile"
-          }
-        },
-        {
-          "name": "Doctor Dashboard",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_DOCTOR_TOKEN"
-              }
-            ],
-            "url": "{{baseUrl}}/api/v1/doctor/dashboard"
-          }
-        },
-        {
-          "name": "Review Scan",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer REPLACE_WITH_DOCTOR_TOKEN"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"notes\": \"Needs follow-up check\",\n  \"override_result\": \"Cavity\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/doctor/scans/1/review"
-          }
+            {
+              "name": "Update Doctor Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Mostafa Updated\",\n  \"phone\": \"01077777777\",\n  \"specialty_ids\": [1]\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/doctor/profile"
+              }
+            },
+            {
+              "name": "Update Doctor Password",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current_password\": \"doctor123\",\n  \"new_password\": \"doctor1234\",\n  \"new_password_confirmation\": \"doctor1234\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/doctor/password"
+              }
+            },
+            {
+              "name": "Doctor Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/statistics"
+              }
+            },
+            {
+              "name": "Delete Doctor Account",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/account"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Doctor Dashboard",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/dashboard"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patients",
+          "item": [
+            {
+              "name": "My Patient List",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/patients"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reports",
+          "item": [
+            {
+              "name": "My Reports",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/reports"
+              }
+            },
+            {
+              "name": "Show My Report",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/reports/{{reportId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reservations",
+          "item": [
+            {
+              "name": "My Reservations",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/reservations"
+              }
+            },
+            {
+              "name": "Show Reservation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/doctor/reservations/{{reservationId}}"
+              }
+            },
+            {
+              "name": "Accept Reservation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status_notes\": \"Accepted by doctor and waiting confirmation.\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/doctor/reservations/{{reservationId}}/accept"
+              }
+            },
+            {
+              "name": "Refuse Reservation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Doctor is unavailable at the requested time.\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/doctor/reservations/{{reservationId}}/refuse"
+              }
+            },
+            {
+              "name": "Update Reservation Time",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reservation_time\": \"2026-06-22 15:00:00\",\n  \"status_notes\": \"Rescheduled by doctor.\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/doctor/reservations/{{reservationId}}/time"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Scans",
+          "item": [
+            {
+              "name": "Review Scan",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"notes\": \"Needs follow-up check\",\n  \"override_result\": \"Cavity\"\n}"
+                },
+                "url": "{{baseUrl}}/api/v1/doctor/scans/{{scanId}}/review"
+              }
+            }
+          ]
         }
       ]
     }

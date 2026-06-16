@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Report extends Model
+class Reservation extends Model
 {
     use HasFactory;
 
@@ -15,6 +15,13 @@ class Report extends Model
         'title',
         'description',
         'image_path',
+        'reservation_time',
+        'status',
+        'status_notes',
+    ];
+
+    protected $casts = [
+        'reservation_time' => 'datetime',
     ];
 
     public function patient()

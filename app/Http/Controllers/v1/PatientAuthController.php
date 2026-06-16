@@ -4,6 +4,8 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiTrait;
+use App\Http\Traits\RequiresPatientUser;
+use App\Http\Traits\SerializesDentalApiData;
 use App\Models\Patient;
 use App\Models\Activity;
 use Illuminate\Http\Request;
@@ -12,6 +14,8 @@ use Illuminate\Support\Facades\Hash;
 class PatientAuthController extends Controller
 {
     use ApiTrait;
+    use RequiresPatientUser;
+    use SerializesDentalApiData;
 
     /**
      * Register a new patient.
@@ -43,7 +47,7 @@ class PatientAuthController extends Controller
         $token = $patient->createToken('Patient API Token')->plainTextToken;
 
         return $this->successResponse([
-            'patient' => $patient->load('doctor'),
+            'patient' => $this->serializePatient($patient->load('doctor.specialties')),
             'token' => $token,
         ], 'Patient registered and logged in successfully');
     }
@@ -67,7 +71,7 @@ class PatientAuthController extends Controller
         $token = $patient->createToken('Patient API Token')->plainTextToken;
 
         return $this->successResponse([
-            'patient' => $patient->load('doctor'),
+            'patient' => $this->serializePatient($patient->load('doctor.specialties')),
             'token' => $token,
         ], 'Patient logged in successfully');
     }
@@ -77,12 +81,14 @@ class PatientAuthController extends Controller
      */
     public function profile()
     {
-        $patient = auth()->user();
-
-        if (!$patient || !($patient instanceof Patient)) {
-            return $this->errorResponse([], 'Unauthorized or not a patient', 401);
+        $patient = $this->requirePatient();
+        if (!$patient instanceof Patient) {
+            return $patient;
         }
 
-        return $this->successResponse($patient->load('doctor'), 'Patient profile retrieved successfully');
+        return $this->successResponse(
+            $this->serializePatient($patient->load('doctor.specialties')),
+            'Patient profile retrieved successfully'
+        );
     }
 }

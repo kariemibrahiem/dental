@@ -4,27 +4,33 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiTrait;
+use App\Http\Traits\RequiresDoctorUser;
+use App\Http\Traits\SerializesDentalApiData;
 use App\Models\Doctor;
-use App\Models\Scan;
 use App\Models\Patient;
 use App\Models\Activity;
+use App\Models\Report;
+use App\Models\Reservation;
+use App\Models\Scan;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Support\DentalCaseCatalog;
+use App\Support\ReservationStatusCatalog;
 
 class DoctorDashboardController extends Controller
 {
     use ApiTrait;
+    use RequiresDoctorUser;
+    use SerializesDentalApiData;
 
     /**
      * Get doctor dashboard stats (assigned patients count, pending scan counts) and list of their patients.
      */
     public function index()
     {
-        $doctor = auth()->user();
-
-        if (!$doctor || !($doctor instanceof Doctor)) {
-            return $this->errorResponse([], 'Unauthorized or not a doctor', 401);
+        $doctor = $this->requireDoctor();
+        if (!$doctor instanceof Doctor) {
+            return $doctor;
         }
 
         // Assigned patients count
@@ -47,13 +53,31 @@ class DoctorDashboardController extends Controller
             ->latest()
             ->get();
 
+        $reports = Report::with('patient', 'doctor')
+            ->where('doctor_id', $doctor->id)
+            ->latest()
+            ->get();
+
+        $reservations = Reservation::with('patient', 'doctor')
+            ->where('doctor_id', $doctor->id)
+            ->latest()
+            ->get();
+
         return $this->successResponse([
             'stats' => [
                 'assigned_patients' => $patientsCount,
                 'pending_reviews' => $pendingScansCount,
+                'total_reports' => $reports->count(),
+                'total_reservations' => $reservations->count(),
+                'pending_reservations' => $reservations->where('status', ReservationStatusCatalog::PENDING)->count(),
+                'accepted_reservations' => $reservations->where('status', ReservationStatusCatalog::ACCEPTED)->count(),
+                'refused_reservations' => $reservations->where('status', ReservationStatusCatalog::REFUSED)->count(),
+                'cancelled_reservations' => $reservations->where('status', ReservationStatusCatalog::CANCELLED)->count(),
             ],
-            'patients' => $patients,
+            'patients' => $patients->map(fn (Patient $patient) => $this->serializePatient($patient->load('doctor.specialties')))->values(),
             'pending_scans' => $pendingScans,
+            'reports' => $reports->map(fn (Report $report) => $this->serializeReport($report))->values(),
+            'reservations' => $reservations->map(fn (Reservation $reservation) => $this->serializeReservation($reservation))->values(),
         ], 'Doctor dashboard data retrieved successfully');
     }
 
@@ -62,10 +86,9 @@ class DoctorDashboardController extends Controller
      */
     public function reviewScan(Request $request, $id)
     {
-        $doctor = auth()->user();
-
-        if (!$doctor || !($doctor instanceof Doctor)) {
-            return $this->errorResponse([], 'Unauthorized or not a doctor', 401);
+        $doctor = $this->requireDoctor();
+        if (!$doctor instanceof Doctor) {
+            return $doctor;
         }
 
         $request->validate([

@@ -4,29 +4,44 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiTrait;
+use App\Http\Traits\RequiresPatientUser;
+use App\Http\Traits\SerializesDentalApiData;
 use App\Models\Patient;
+use App\Models\Report;
+use App\Models\Reservation;
 use App\Models\Scan;
 use App\Models\Activity;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Support\DentalCaseCatalog;
+use App\Support\ReservationStatusCatalog;
 
 class PatientDashboardController extends Controller
 {
     use ApiTrait;
+    use RequiresPatientUser;
+    use SerializesDentalApiData;
 
     /**
      * Get patient dashboard metrics, diagnostic stats, scan histories, and doctor profiles.
      */
     public function index()
     {
-        $patient = auth()->user();
-
-        if (!$patient || !($patient instanceof Patient)) {
-            return $this->errorResponse([], 'Unauthorized or not a patient', 401);
+        $patient = $this->requirePatient();
+        if (!$patient instanceof Patient) {
+            return $patient;
         }
 
         $scans = Scan::where('patient_id', $patient->id)->latest()->get();
+        $reports = Report::with('doctor', 'patient')
+            ->where('patient_id', $patient->id)
+            ->latest()
+            ->get();
+        $reservations = Reservation::with('doctor', 'patient')
+            ->where('patient_id', $patient->id)
+            ->latest()
+            ->get();
+
         $totalScans = $scans->count();
         $healthyScans = $scans->filter(fn ($scan) => DentalCaseCatalog::normalize($scan->ai_result) === DentalCaseCatalog::HEALTHY)->count();
         $cavityScans = $scans->filter(fn ($scan) => DentalCaseCatalog::normalize($scan->ai_result) === DentalCaseCatalog::CAVITY)->count();
@@ -39,6 +54,12 @@ class PatientDashboardController extends Controller
                 'cavity_scans' => $cavityScans,
                 'infection_scans' => $infectionScans,
                 'risk_scans' => $cavityScans + $infectionScans,
+                'total_reports' => $reports->count(),
+                'total_reservations' => $reservations->count(),
+                'pending_reservations' => $reservations->where('status', ReservationStatusCatalog::PENDING)->count(),
+                'accepted_reservations' => $reservations->where('status', ReservationStatusCatalog::ACCEPTED)->count(),
+                'refused_reservations' => $reservations->where('status', ReservationStatusCatalog::REFUSED)->count(),
+                'cancelled_reservations' => $reservations->where('status', ReservationStatusCatalog::CANCELLED)->count(),
             ],
             'scans' => $scans->map(function ($scan) {
                 return [
@@ -54,7 +75,9 @@ class PatientDashboardController extends Controller
                     'updated_at' => $scan->updated_at?->toDateTimeString(),
                 ];
             })->values(),
-            'doctor' => $patient->doctor ? $patient->doctor->load('specialties') : null,
+            'reports' => $reports->map(fn (Report $report) => $this->serializeReport($report))->values(),
+            'reservations' => $reservations->map(fn (Reservation $reservation) => $this->serializeReservation($reservation))->values(),
+            'doctor' => $patient->doctor ? $this->serializeDoctor($patient->doctor->load('specialties')) : null,
         ], 'Patient dashboard data retrieved successfully');
     }
 
@@ -63,10 +86,9 @@ class PatientDashboardController extends Controller
      */
     public function uploadScan(Request $request)
     {
-        $patient = auth()->user();
-
-        if (!$patient || !($patient instanceof Patient)) {
-            return $this->errorResponse([], 'Unauthorized or not a patient', 401);
+        $patient = $this->requirePatient();
+        if (!$patient instanceof Patient) {
+            return $patient;
         }
 
         $request->validate([

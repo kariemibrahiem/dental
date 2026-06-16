@@ -5,7 +5,9 @@ namespace App\Services\Admin;
 use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Activity;
+use App\Models\Reservation;
 use App\Support\DentalCaseCatalog;
+use App\Support\ReservationStatusCatalog;
 use Carbon\Carbon;
 
 class DashboardService
@@ -13,8 +15,10 @@ class DashboardService
     public function getMetrics()
     {
         $patients = Patient::with('doctor')->get();
+        $reservations = Reservation::with('patient', 'doctor')->get();
         $totalPatients = $patients->count();
         $totalDoctors = Doctor::count();
+        $totalReservations = $reservations->count();
 
         $healthyCount = $patients->filter(
             fn ($patient) => DentalCaseCatalog::normalize($patient->result) === DentalCaseCatalog::HEALTHY
@@ -45,13 +49,26 @@ class DashboardService
         $casesLabels = DentalCaseCatalog::frontResults();
         $casesData = [$healthyCount, $cavityCount, $infectionCount];
 
-        $patientsByDocRaw = Doctor::withCount('patients')->get();
+        $patientsByDocRaw = Doctor::withCount(['patients', 'reservations', 'reports'])->get();
         $docLabels = [];
         $docData = [];
         foreach ($patientsByDocRaw as $doc) {
             $docLabels[] = $doc->name;
             $docData[] = $doc->patients_count;
         }
+
+        $reservationStatusLabels = [
+            ReservationStatusCatalog::PENDING,
+            ReservationStatusCatalog::ACCEPTED,
+            ReservationStatusCatalog::REFUSED,
+            ReservationStatusCatalog::CANCELLED,
+        ];
+        $reservationStatusData = [
+            $reservations->where('status', ReservationStatusCatalog::PENDING)->count(),
+            $reservations->where('status', ReservationStatusCatalog::ACCEPTED)->count(),
+            $reservations->where('status', ReservationStatusCatalog::REFUSED)->count(),
+            $reservations->where('status', ReservationStatusCatalog::CANCELLED)->count(),
+        ];
 
         $criticalCases = $patients
             ->filter(fn ($patient) => DentalCaseCatalog::isCritical($patient->result))
@@ -80,7 +97,23 @@ class DashboardService
                 ];
             });
 
-        $doctorStatistics = Doctor::withCount('patients')
+        $recentReservations = $reservations
+            ->sortByDesc('created_at')
+            ->take(10)
+            ->map(function ($reservation) {
+                return [
+                    'id' => $reservation->id,
+                    'patient_name' => $reservation->patient?->name,
+                    'doctor_name' => $reservation->doctor?->name,
+                    'title' => $reservation->title,
+                    'status' => $reservation->status,
+                    'reservation_time' => $reservation->reservation_time?->toDateTimeString(),
+                    'created_at' => $reservation->created_at?->toDateTimeString(),
+                ];
+            })
+            ->values();
+
+        $doctorStatistics = Doctor::withCount(['patients', 'reservations', 'reports'])
             ->orderByDesc('patients_count')
             ->orderBy('name')
             ->get()
@@ -89,6 +122,8 @@ class DashboardService
                     'id' => $doctor->id,
                     'name' => $doctor->name,
                     'patients_count' => $doctor->patients_count,
+                    'reservations_count' => $doctor->reservations_count,
+                    'reports_count' => $doctor->reports_count,
                 ];
             })
             ->values();
@@ -97,15 +132,25 @@ class DashboardService
             'stats' => [
                 'total_patients' => $totalPatients,
                 'total_doctors' => $totalDoctors,
+                'total_reservations' => $totalReservations,
                 'healthy' => $healthyCount,
                 'cavity' => $cavityCount,
                 'infection' => $infectionCount,
+                'pending_reservations' => $reservationStatusData[0],
+                'accepted_reservations' => $reservationStatusData[1],
+                'refused_reservations' => $reservationStatusData[2],
+                'cancelled_reservations' => $reservationStatusData[3],
             ],
             'total_patients' => $totalPatients,
             'total_doctors' => $totalDoctors,
+            'total_reservations' => $totalReservations,
             'healthy_count' => $healthyCount,
             'cavity_count' => $cavityCount,
             'infection_count' => $infectionCount,
+            'pending_reservations' => $reservationStatusData[0],
+            'accepted_reservations' => $reservationStatusData[1],
+            'refused_reservations' => $reservationStatusData[2],
+            'cancelled_reservations' => $reservationStatusData[3],
             'charts' => [
                 'daily_patients' => [
                     'labels' => $dailyLabels,
@@ -119,10 +164,15 @@ class DashboardService
                     'labels' => $docLabels,
                     'data' => $docData,
                 ],
+                'reservations_by_status' => [
+                    'labels' => $reservationStatusLabels,
+                    'data' => $reservationStatusData,
+                ],
             ],
             'alerts' => $criticalCases,
             'recent_activity' => $recentActivities,
             'recent_activities' => $recentActivities,
+            'recent_reservations' => $recentReservations,
             'doctor_statistics' => $doctorStatistics,
             'case_results' => DentalCaseCatalog::frontResults(),
         ];
