@@ -101,6 +101,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
         Route::post('/patients/destroySelected', [\App\Http\Controllers\Admin\PatientController::class, 'deleteSelected'])
             ->name('patients.destroySelected');
 
+        Route::get('/reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])
+            ->name('reports.export');
         Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class);
         Route::post('/reports/destroySelected', [\App\Http\Controllers\Admin\ReportController::class, 'destroySelected'])
             ->name('reports.destroySelected');

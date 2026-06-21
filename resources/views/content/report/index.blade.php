@@ -12,7 +12,10 @@
 <div class="card shadow-sm border-0">
     <h5 class="card-header d-flex justify-content-between align-items-center flex-wrap">
         <span class="fw-bold"><span class="badge bg-label-primary me-2"><i class="bx bx-file fs-4"></i></span> Patient Medical Reports</span>
-        <div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('reports.export') }}" class="btn btn-success">
+                <i class="bx bx-download me-1"></i> Export CSV
+            </a>
             <button class="btn btn-danger" id="deleteSelectedBtn"><i class="bx bx-trash me-1"></i> Delete Selected</button>
         </div>
     </h5>

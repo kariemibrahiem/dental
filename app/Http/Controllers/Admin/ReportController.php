@@ -46,6 +46,45 @@ class ReportController extends Controller
         return view('content.report.index');
     }
 
+    public function export()
+    {
+        $fileName = 'medical-reports-' . now()->format('Y-m-d-His') . '.csv';
+        $reports = Report::with(['patient', 'doctor'])->latest()->get();
+
+        return response()->streamDownload(function () use ($reports) {
+            $output = fopen('php://output', 'w');
+
+            // UTF-8 BOM keeps Arabic text readable when opening the file in Excel.
+            fwrite($output, "\xEF\xBB\xBF");
+
+            fputcsv($output, [
+                'ID',
+                'Patient',
+                'Doctor',
+                'Report Title',
+                'Description',
+                'Scan Document',
+                'Uploaded At',
+            ]);
+
+            foreach ($reports as $report) {
+                fputcsv($output, [
+                    $report->id,
+                    $report->patient?->name ?? '-',
+                    $report->doctor?->name ?? '-',
+                    $report->title,
+                    $report->description,
+                    $report->image_path ? asset('storage/' . $report->image_path) : '-',
+                    optional($report->created_at)->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($output);
+        }, $fileName, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function destroy($id)
     {
         try {

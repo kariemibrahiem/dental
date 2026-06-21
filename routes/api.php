@@ -61,7 +61,6 @@ Route::group(['prefix' => 'v1'], function() {
         Route::get('dashboard', [DashboardController::class, 'index']);
         Route::apiResource('doctors', DoctorController::class);
         Route::apiResource('patients', PatientController::class);
-        Route::apiResource('users', ClinicUserController::class);
         
         // --------------------------------------
         // Patient Guard Routes
